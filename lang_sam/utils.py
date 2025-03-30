@@ -9,6 +9,28 @@ MIN_AREA = 100
 def load_image(image_path: str):
     return Image.open(image_path).convert("RGB")
 
+def draw_mask(image_rgb, masks, xyxy, probs, labels):
+    box_annotator = sv.BoxCornerAnnotator()
+    label_annotator = sv.LabelAnnotator()
+    mask_annotator = sv.MaskAnnotator()
+    # Create class_id for each unique label
+    unique_labels = list(set(labels))
+    class_id_map = {label: idx for idx, label in enumerate(unique_labels)}
+    class_id = [class_id_map[label] for label in labels]
+
+    # Add class_id to the Detections object
+    # Create a blank mask image with the same dimensions as the input image
+    mask_image = np.zeros_like(image_rgb, dtype=np.uint8)
+
+    # Iterate through each mask and apply it to the blank mask image
+    for mask in masks:
+        mask = mask.astype(bool)
+        mask_image[mask] = [255, 255, 255]  # Set the mask region to white
+
+    # Return the mask image
+    return mask_image
+    return annotated_image
+
 
 def draw_image(image_rgb, masks, xyxy, probs, labels):
     box_annotator = sv.BoxCornerAnnotator()
